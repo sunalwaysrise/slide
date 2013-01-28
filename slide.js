@@ -60,7 +60,7 @@ function move(config){
 	}
 	function autoplay(){
 		n = n >= (count - 1) ? 0 : n + 1;
-		$("#play_text li").eq(n).trigger('click');
+		$(config.navDom).children("a").eq(n).trigger('click');
 	}
 }
 move({
