@@ -9,7 +9,7 @@ function slide(configs){
     		var dom=$(dom).children(childrenDom).eq(0).clone();
 		$(dom).append(dom);
 		$(dom).children(childrenDom).remove();
-		$(dom).css({"left":0});
+		$(dom).css({configs.slide:0});
 	})
     }
     if(configs.auto){
