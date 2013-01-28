@@ -1,6 +1,7 @@
 /**
  * @author luwenbin@live.com
  */
+//内容的定向滑动
 function slide(configs){
     configs.dom.style.position="absolute";
     configs.parentDom.style.position="relative";
@@ -22,7 +23,6 @@ function slide(configs){
     	slides()
     }
 }
-
 //使用
 slide({
 	dom:"content",//
@@ -34,3 +34,42 @@ slide({
 	childrenDom:"children",//子元素名称
 	slide:"top" //滑动方向，top 或 left
 })
+
+
+//内容的轮换
+function move(config){
+	var t = n = count = 0;
+	function slide(){
+		count = $(config.dom).children(config.children).size();
+		$(config.dom).children(config.children).hide();
+		$(config.dom).children(config.children).eq(0).show();
+		for(i;i<count;i++){
+			$(config.navDom).append("<a>"(Number(i)+1)"</a>");
+		}
+		$(config.navDom).eq(0).addClass(config.navDomOn);
+		$(condig.navDom).children("a").click(function() {
+			var i = $(this).index();
+			n = i
+			if (i >= count) return;
+			$(config.dom).children(config.children).filter(":visible").fadeOut(500);
+			$(config.dom).children(config.children).eq(i).fadeIn(1000);
+			$(this).addClass(config.navDomOn).siblings().removeClass(config.navDomOn);
+		});
+		t = setInterval("slide()", config.speed);
+		$(config.parentDom).hover(function(){clearInterval(t)}, function(){t = setInterval("slide()", config.speed);});
+	}
+	function autoplay(){
+		n = n >= (count - 1) ? 0 : n + 1;
+		$("#play_text li").eq(n).trigger('click');
+	}
+}
+move({
+	dom:"",//元素
+	children:"",//子元素的标签
+	parentDom:"",//父元素
+	navDom:"",//导航的id
+	navDomOn:"",//获得焦点时的样式
+	speed:""//轮换的速度
+})
+
+
