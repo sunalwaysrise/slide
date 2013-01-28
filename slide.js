@@ -2,15 +2,15 @@
  * @author luwenbin@live.com
  */
 function slide(configs){
-  configs.dom.style.position="absolute";
-	configs.parentDom.style.position="relative";
-	function slides(){
-		$(configs.parentDom).animate({configs.slide:-configs.distance}, configs.speed,function(){
-			var dom=$(dom).children(childrenDom).eq(0).clone();
-			$(dom).append(dom);
-			$(dom).children(childrenDom).remove();
-			$(dom).css({"left":0});
-		})
+    configs.dom.style.position="absolute";
+    configs.parentDom.style.position="relative";
+    function slides(){
+    	$(configs.parentDom).animate({configs.slide:-configs.distance}, configs.speed,function(){
+    		var dom=$(dom).children(childrenDom).eq(0).clone();
+		$(dom).append(dom);
+		$(dom).children(childrenDom).remove();
+		$(dom).css({"left":0});
+	})
     }
     if(configs.auto){
     	var c2=setInterval("slides()", configs.time);
@@ -23,6 +23,7 @@ function slide(configs){
     }
 }
 
+//使用
 slide({
 	dom:"content",//
 	auto:true, //设置自动  true 或 false,
