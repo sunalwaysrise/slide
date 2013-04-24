@@ -1,4 +1,3 @@
-
   	$.get("/qugou/getcontentbygoodsid.jspa", {
 			goodsid : args.id
 		}, function(data) {
