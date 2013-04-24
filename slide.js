@@ -73,3 +73,34 @@ move({
 })
 
 
+
+
+//弹出内容始终居显示
+
+$(window).resize(function(){if(_obj1.attr("data_v")!="o"){return false;}setPosition(_obj1);});
+$(window).scroll(function(){if(_obj1.attr("data_v")!="o"){return false;}setPosition(_obj1);});
+function setPosition(_obj) {
+	var t = document.documentElement.scrollTop || document.body.scrollTop;
+	var viewHeight = $(window).height(), viewWidth = $(window).width(), _objHeight = _obj.height(), _objWidth = _obj.width();
+	var dialogTop = (viewHeight / 2) - (_objHeight / 2) + t;
+	var dialogLeft = (viewWidth / 2) - (_objWidth / 2);
+	_obj.css({top : dialogTop,left : dialogLeft});
+}
+
+
+//滑动显示
+var lens=$("#content li").length;
+  //console.log("总数"+lens)
+  window.count=0;
+  $("#goNext").click(function(){
+    count > (lens-2) ? count=0 : count=count+1;
+    //console.log(count);
+    $("#content li").fadeOut();
+    $("#content li").eq(count).fadeIn();
+  })
+  $("#goPrev").click(function(){
+    count < 1 ? count=(lens-1) : count=count-1;
+    //console.log(count);
+    $("#content li").fadeOut();
+    $("#content li").eq(count).fadeIn();
+  })
