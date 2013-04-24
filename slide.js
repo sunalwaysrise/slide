@@ -118,3 +118,17 @@ for(var i = 0; i < pairs.length; i++) {
         value = decodeURIComponent(value);
         args[argname] = value;
 }
+
+
+// 正则 邮箱判断
+var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+if(!myreg.test($(this).val())){
+	$(this).addClass("error").val("邮箱格式错误");
+	$(this).focus()
+	return false;
+}
+
+//寻找父窗口元素
+$(window.parent.document).find("#selector")
+//刷新父窗口
+window.parent.location.reload();
