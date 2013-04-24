@@ -75,8 +75,8 @@ move({
 
 
 
-//弹出内容始终居显示
-
+//弹出内容始终居中间显示
+var _obj1=$("#object");
 $(window).resize(function(){if(_obj1.attr("data_v")!="o"){return false;}setPosition(_obj1);});
 $(window).scroll(function(){if(_obj1.attr("data_v")!="o"){return false;}setPosition(_obj1);});
 function setPosition(_obj) {
