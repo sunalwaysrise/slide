@@ -1,10 +1,10 @@
-  	$.get("/qugou/getcontentbygoodsid.jspa", {
-			goodsid : args.id
-		}, function(data) {
+//ajax 返回的数据进行分页显示
+
+$.get("url", {goodsid : args.id}, function(data) {
 			eval(data);
 			var i = 0, len = data.length, html0 = "", per = 6;
-			$("#recommendListTitle b").html(len);
-			if (len == 0) {	$("#recommendListTitle").hide();}
+			$("#contentTitle").html(len);
+			if (len == 0) {	$("#content").hide();}
 			if (len > per) {
 				var totals = len;
 				var pages = Math.ceil(totals / per);
@@ -22,7 +22,6 @@
 				$(".pageList").click(function() {
 					var x = $(this).attr("id");
 					var y = $(this).attr("name");
-					
 					insert(x, y, data);
 				})
 			} else {
@@ -30,11 +29,11 @@
 			}
 			function insert(x, y, data) {
 				var x=Number(x),y=Number(y);
-				$("#recommendList").html("")
+				$("#content").html("")
 				var html0="";
 				for (x; x < y; x++) {
-					html0 += '<li>' + data[x].usernick +'</a></div></h3>';
+					html0 += '<li>' + data[x].content +'</li>';
 				}
-				$("#recommendList").append(html0);
+				$("#content").append(html0);
 			}
 		})
