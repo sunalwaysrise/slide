@@ -63,12 +63,15 @@ $.extend(l.jsonPage,{
     setPage:function(){
     	if(!this._length){return }
     	if(this._length>=this._perPageLength){
-    		var max=Math.ceil(this._length / this._perPageLength),tmp=[];
+    		var max=Math.ceil(this._length / this._perPageLength),tmp=[],next;
+    		max>2 ? next=this._perPageLength*2 : next=this._length;
+    		tmp.push("<a data_beginRow='"+ 0 +"' data_endRow='"+ this._perPageLength +"'></a>");
     		for(var i=0;i<max;i++){
     			var beginRow = i * this._perPageLength,endRow = beginRow + this._perPageLength;
 				if (endRow > length) {endRow = length;}
     			tmp.push("<a data_beginRow='" + beginRow + "' data_endRow='" + endRow + "'>"+(i+1)+"</a>");
     		}
+    		tmp.push("<a data_beginRow='"+ this._perPageLength +"' data_endRow='"+ next +"'></a>");
     		tmp.join("");
     		this._nav.html(tmp);
     	}else{
@@ -87,7 +90,14 @@ $.extend(l.jsonPage,{
 		this._content.html(tmp);
     },
     selected:function(o){
-    	var beginRow=o.attr("data_beginRow"),endRow=o.attr("data_endRow");
+    	var beginRow=o.attr("data_beginRow"),endRow=o.attr("data_endRow"),prev,prev2,next;
+    	beginRow>this._perPageLength ? prev=beginRow-this._perPageLength : prev=0;
+    	this._length>endRow ? prev2=endRow : prev2=beginRow ;
+    	next=endRow+this._perPageLength;
+    	if(next>this._length){next=this._length;}
+    	o.siblings().removeClass("NavOn");o.addClass("NavOn");
+    	this._nav.eq(0).attr({"data_beginRow":prev,"data_endRow":beginRow});
+    	this._nav.last().attr({"data_beginRow":prev2,"data_endRow":next});
     	this.setContent(beginRow,endRow);
     }
 })
