@@ -61,6 +61,7 @@ $.extend(l.jsonPage,{
 		}
 	},
     setPage:function(){
+    	if(!this._length){return }
     	if(this._length>=this._perPageLength){
     		var max=Math.ceil(this._length / this._perPageLength),tmp=[];
     		for(var i=0;i<max;i++){
@@ -76,6 +77,7 @@ $.extend(l.jsonPage,{
     	this.selected();
     },
     setContent:function(beginRow,endRow){
+    	if(!this._data){return}
     	var tmp=[];
     	this._content.html("");
     	for (beginRow; beginRow < endRow; beginRow++){
@@ -84,11 +86,12 @@ $.extend(l.jsonPage,{
 		tmp.join("");
 		this._content.html(tmp);
     },
-    selected:function(){
-    	var beginRow=$(this).attr("data_beginRow"),endRow=$(this).attr("data_endRow");
+    selected:function(o){
+    	var beginRow=o.attr("data_beginRow"),endRow=o.attr("data_endRow");
     	this.setContent(beginRow,endRow);
     }
 })
-
-// l.jsonPage.index(data,"10","#nav","#content")
-
+/*
+l.jsonPage.index(data,"10","#nav","#content")
+$("#nav").live("click",function(){var o=$(this);l.jsonPage.selected(o);})
+*/
