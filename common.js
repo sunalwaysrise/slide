@@ -107,6 +107,7 @@ $.extend(l.dialog,{
 	creater:function(){
 		if($("#lDialogBox")){return;}
 		$(body).append('<div id="lDialogBox"><div id="lDialogBoxTitle"></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
+		$("#lDialogBox").show();
 		l.setPosition($("#lDialogBox"));
 	},
 	alert:function(title,content,btn){
