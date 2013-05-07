@@ -2,7 +2,7 @@
 author: luwenbin@live.com
 */
 var l={
-  xhr:window.XMLHttpRequest||window.ActiveXObject("Microsoft.XMLHTTP"),
+	xhr:window.XMLHttpRequest||window.ActiveXObject("Microsoft.XMLHTTP"),
 	getArgs:function(argName){
 		if(!argName){return}
 		var args = {},query = location.search.substring(1),pairs = query.split("&"); 
@@ -35,6 +35,25 @@ var l={
     jsonPage:{
     },
     dialog:{
+    },
+    throttle:function(fn, delay, mustRunDelay){
+    	var timer = null;
+    	var t_start;
+    	return function(){
+    		var context = this, args = arguments, t_curr = +new Date();
+    		clearTimeout(timer);
+    		if(!t_start){
+    			t_start = t_curr;
+    		}
+    		if(t_curr - t_start >= mustRunDelay){
+    			fn.apply(context, args);
+    			t_start = t_curr;
+    		} else {
+    			timer = setTimeout(function(){
+    				fn.apply(context, args);
+    			}, delay);
+    		}
+    	}
     }
 }
 $.extend(l.ajax,{
@@ -105,12 +124,13 @@ $.extend(l.jsonPage,{
 })
 $.extend(l.dialog,{
 	creater:function(){
-		if($("#lDialogBox")){return;}
-		$(body).append('<div id="lDialogBox"><div id="lDialogBoxTitle"></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
-		$("#lDialogBox").show();
+		if(!$("#lDialogBox")){
+		    $(body).append('<div id="lDialogBox"><div id="lDialogBoxTitle"></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
+	    }
+		$("#lDialogBox").css({"position":"absolute","zIndex":"1000"}).show();
 		l.setPosition($("#lDialogBox"));
 	},
-	alert:function(title,content,btn){
+	alert:function(title,content,lock,btn){
 		this.creater();
 		var title=title,content=content,btn=btn;
 		if(!title){title="error";}
@@ -119,9 +139,12 @@ $.extend(l.dialog,{
 		$("#lDialogBoxTitle").html(title);
 		$("#lDialogBoxContent").html(content);
 		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn+'</a>');
+		if(lock=="lock"){
+			$(window).resize(function(){l.throttle(this.lock(), 50, 100)});
+		}
 		this.selected();
 	},
-	confirm:function(title,content,btn1,btn2){
+	confirm:function(title,content,lock,btn1,btn2){
 		this.creater();
 		var title=title,content=content,btn1=btn1,btn2=btn2;
 		if(!title){title="error";}
@@ -130,7 +153,10 @@ $.extend(l.dialog,{
 		if(!btn2){btn2="取消";}
 		$("#lDialogBoxTitle").html(title);
 		$("#lDialogBoxContent").html(content);
-		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn1+'</a><a id="lDialogFalse">'+btn1+'</a>');
+		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn1+'</a><a id="lDialogFalse">'+btn2+'</a>');
+		if(lock=="lock"){
+			$(window).resize(function(){l.throttle(this.lock(), 50, 100)});
+		}
 		this.selected();
 	},
 	selected:function(){
@@ -144,8 +170,23 @@ $.extend(l.dialog,{
 		});
 	},
 	close:function(){
-		$("#lDialogBox").hide();
-		$("#lDialogBoxTitle,#lDialogBoxContent").html("");
+		$("#lDialogBox,#lDialogLock").hide();
+		$("#lDialogBoxTitle,#lDialogBoxContent,#lDialogBoxBtn").html("");
+	},
+	lock:function(){
+		if(!$("#lDialogLock")){
+			$(body).append('<div id="lDialogLock"></div>');
+		}
+		var lockWidth=$(window).width(),lockHeight=$(window).height();
+		$("#lDialogLock").css({
+			"width":lockWidth,
+			"height":lockHeight,
+			"position":"absolute",
+			"zIndex":"999",
+			"background":"#ddd",
+			"opacity":"0.3",
+			"filter":"Alpha(opacity=30)"
+		}).show();
 	}
 })
 /*
