@@ -33,6 +33,8 @@ var l={
 		if(method!="get"){method="get"}
 	},
     jsonPage:{
+    },
+    dialog:{
     }
 }
 $.extend(l.ajax,{
@@ -100,6 +102,50 @@ $.extend(l.jsonPage,{
     	this._nav.last().attr({"data_beginRow":prev2,"data_endRow":next});
     	this.setContent(beginRow,endRow);
     }
+})
+$.extend(l.dialog,{
+	creater:function(){
+		if($("#lDialogBox")){return;}
+		$(body).append('<div id="lDialogBox"><div id="lDialogBoxTitle"></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
+		l.setPosition($("#lDialogBox"));
+	},
+	alert:function(title,content,btn){
+		this.creater();
+		var title=title,content=content,btn=btn;
+		if(!title){title="error";}
+		if(!content){content="error";}
+		if(!btn){btn="确定";}
+		$("#lDialogBoxTitle").html(title);
+		$("#lDialogBoxContent").html(content);
+		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn+'</a>');
+		this.selected();
+	},
+	confirm:function(title,content,btn1,btn2){
+		this.creater();
+		var title=title,content=content,btn1=btn1,btn2=btn2;
+		if(!title){title="error";}
+		if(!content){content="error";}
+		if(!btn1){btn1="确定";}
+		if(!btn2){btn2="取消";}
+		$("#lDialogBoxTitle").html(title);
+		$("#lDialogBoxContent").html(content);
+		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn1+'</a><a id="lDialogFalse">'+btn1+'</a>');
+		this.selected();
+	},
+	selected:function(){
+		$("#lDialogTrue").live('click',function(){
+			//
+			this.close();
+		});
+		$("#lDialogFalse").live('click',function(){
+			//
+			this.close();
+		});
+	},
+	close:function(){
+		$("#lDialogBox").hide();
+		$("#lDialogBoxTitle,#lDialogBoxContent").html("");
+	}
 })
 /*
 l.jsonPage.index(data,"10","#nav","#content")
