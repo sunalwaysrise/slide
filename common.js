@@ -32,10 +32,8 @@ var l={
 		if(!url){return}
 		if(method!="get"){method="get"}
 	},
-    jsonPage:{
-    },
-    dialog:{
-    },
+    jsonPage:{},
+    dialog:{},
     throttle:function(fn, delay, mustRunDelay){
     	var timer = null;
     	var t_start;
@@ -125,7 +123,7 @@ $.extend(l.jsonPage,{
 $.extend(l.dialog,{
 	creater:function(){
 		if(!$("#lDialogBox")){
-		    $(body).append('<div id="lDialogBox"><div id="lDialogBoxTitle"></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
+		    $(body).append('<div id="lDialogBox"><div class="lDialogBoxTitle"><div id="lDialogBoxTitle"></div><div id="lDialogClose"></div></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
 	    }
 		$("#lDialogBox").css({"position":"absolute","zIndex":"1000"}).show();
 		l.setPosition($("#lDialogBox"));
@@ -168,6 +166,9 @@ $.extend(l.dialog,{
 			//
 			this.close();
 		});
+		$("#lDialogClose").live('click',function(){
+			this.close();
+		});
 	},
 	close:function(){
 		$("#lDialogBox,#lDialogLock").hide();
@@ -186,7 +187,7 @@ $.extend(l.dialog,{
 			"background":"#ddd",
 			"opacity":"0.3",
 			"filter":"Alpha(opacity=30)"
-		}).show();
+		}).show("fast");
 	}
 })
 /*
