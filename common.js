@@ -47,6 +47,19 @@ var l={
     		}
     	}
     },
+    tabs:function(config){
+    	var lTabNav=config.nav,lContent=config.content,lActive=config.active;
+    	var T=$("#"+lTabNav),C=$("#"+lContent);
+    	T.children("li").eq(0).addClass();
+    	C.children("li").eq(0).show();
+    	T.children("li").click(function(){
+    		var _this=$(this),_index=_this.index();
+    		T.children("li").removeClass("lActive");
+    		_this.addClass("lActive");
+    		C.children("li").hide();
+    		C.children(_index).show();
+    	})
+    },
     ajax:{},
     jsonPage:{},
     dialog:{}
@@ -68,12 +81,13 @@ $.extend(l.ajax,{
 		if(typeof(data)=="undefined"){
 			tmpdata="?null";
 		}
-		if(method!="get"){
-		    l.xhr.open("post",url,anysc);
+		method=method.toUpperCase();
+		if(method!="GET"){
+		    l.xhr.open("POST",url,anysc);
 		    l.xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		    l.xhr.send(tmpdata);
 		}else{
-		    l.xhr.open("get",url+tmpdata,anysc);
+		    l.xhr.open("GET",url+tmpdata,anysc);
 		    l.xhr.send();				
 		}
 		l.xhr.onreadystatechange=function(){
