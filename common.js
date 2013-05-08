@@ -2,7 +2,7 @@
 author: luwenbin@live.com
 */
 var l={
-	xhr:window.XMLHttpRequest||window.ActiveXObject("Microsoft.XMLHTTP"),
+	xhr:window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest(),
 	getArgs:function(argName){
 		if(!argName){return}
 		var args = {},query = location.search.substring(1),pairs = query.split("&"); 
@@ -28,12 +28,6 @@ var l={
 		var dialogLeft = (viewWidth / 2) - (_objWidth / 2);
 		_obj.css({top : dialogTop,left : dialogLeft});
 	},
-	ajax:function(url,method,data){
-		if(!url){return}
-		if(method!="get"){method="get"}
-	},
-    jsonPage:{},
-    dialog:{},
     throttle:function(fn, delay, mustRunDelay){
     	var timer = null;
     	var t_start;
@@ -52,14 +46,84 @@ var l={
     			}, delay);
     		}
     	}
-    }
+    },
+    ajax:{},
+    jsonPage:{},
+    dialog:{}
 }
 $.extend(l.ajax,{
-	get:function(url,data){
+	basic:function(config){
+		var url=config.url,method=config.method,data=config.data,anysc=config.anysc,before=config.before,success=config.success,error=config.error,tmpdata,tempdate2=[];
+		if(!url){return false;}
+		anysc!=false ? anysc=true:anysc=false;
+		if(typeof(data)=="string" || typeof(data)=="number"){
+			tmpdata="?"+data;
+		}
+		if(typeof(data)=="object"){
+			for (i in data){
+				tempdate2.push(i+"="+data[i]);
+			}
+			tmpdata=tempdate2.join("&");
+		}
+		if(typeof(data)=="undefined"){
+			tmpdata="?null";
+		}
+		if(method!="get"){
+		    l.xhr.open("post",url,anysc);
+		    l.xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		    l.xhr.send(tmpdata);
+		}else{
+		    l.xhr.open("get",url+tmpdata,anysc);
+		    l.xhr.send();				
+		}
+		l.xhr.onreadystatechange=function(){
+			if(l.xhr.readyState==0||l.xhr.readyState==1||l.xhr.readyState==2||l.xhr.readyState==3){
+				if(typeof(before)=="function"){
+					before;
+				}
+			}else if(l.xhr.readyState==4){
+				if(l.xhr.status==200){
+					console.log(l.xhr.responseText);
+					if(typeof(success)=="function"){
+						success(l.xhr.responseText);
+					}
+				}else if(l.xhr.status==404){
+					return "request 404";
+				}else{
+					if(typeof(error)=="function"){
+						error;
+					}
+				}
+			}
+		}
 	},
-	post:function(url,data){
+	get:function(_config){
+		var config={};
+		if(!config.url){return false;}
+		config.url=_config.url;
+		config.method="get";
+		config.anysc=true;
+		if(_config.data){config.data=_config.data;}
+		if(_config.before){config.before=_config.before;}
+		if(_config.success){config.success=_config.success;}
+		if(_config.error){config.error=_config.error;}
+		l.ajax.basic(config);
+	},
+	post:function(_config){
+		var config={};
+		if(!config.url){return false;}
+		config.url=_config.url;
+		config.method="post";
+		config.anysc=true;
+		if(_config.data){config.data=_config.data;}
+		if(_config.before){config.before=_config.before;}
+		if(_config.success){config.success=_config.success;}
+		if(_config.error){config.error=_config.error;}
+		l.ajax.basic(config);
 	}
 })
+//实例 l.ajax.get({url:"url",data:"data",before:"before",success:"success",error:"error"});
+//实例 l.ajax.baisc({url:"url",data:"data",method:"post",anysc:false,before:"before",success:"success",error:"error"});
 $.extend(l.jsonPage,{
 	_data:"",
 	_nav:"",
@@ -120,6 +184,10 @@ $.extend(l.jsonPage,{
     	this.setContent(beginRow,endRow);
     }
 })
+/*
+l.jsonPage.index(data,"10","#nav","#content")
+$("#nav").live("click",function(){var o=$(this);l.jsonPage.selected(o);})
+*/
 $.extend(l.dialog,{
 	creater:function(){
 		if(!$("#lDialogBox")){
@@ -128,23 +196,23 @@ $.extend(l.dialog,{
 		$("#lDialogBox").css({"position":"absolute","zIndex":"1000"}).show();
 		l.setPosition($("#lDialogBox"));
 	},
-	alert:function(title,content,lock,btn){
+	alert:function(config){
 		this.creater();
-		var title=title,content=content,btn=btn;
+		var title=config.title,content=config.content,btn=config.btn;
 		if(!title){title="error";}
 		if(!content){content="error";}
 		if(!btn){btn="确定";}
 		$("#lDialogBoxTitle").html(title);
 		$("#lDialogBoxContent").html(content);
 		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn+'</a>');
-		if(lock=="lock"){
+		if(config.lock=="lock"){
 			$(window).resize(function(){l.throttle(this.lock(), 50, 100)});
 		}
 		this.selected();
 	},
-	confirm:function(title,content,lock,btn1,btn2){
+	confirm:function(config){
 		this.creater();
-		var title=title,content=content,btn1=btn1,btn2=btn2;
+		var title=config.title,content=config.content,btn1=config.btn1,btn2=config.btn2;
 		if(!title){title="error";}
 		if(!content){content="error";}
 		if(!btn1){btn1="确定";}
@@ -152,7 +220,7 @@ $.extend(l.dialog,{
 		$("#lDialogBoxTitle").html(title);
 		$("#lDialogBoxContent").html(content);
 		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn1+'</a><a id="lDialogFalse">'+btn2+'</a>');
-		if(lock=="lock"){
+		if(config.lock=="lock"){
 			$(window).resize(function(){l.throttle(this.lock(), 50, 100)});
 		}
 		this.selected();
@@ -190,7 +258,5 @@ $.extend(l.dialog,{
 		}).show("fast");
 	}
 })
-/*
-l.jsonPage.index(data,"10","#nav","#content")
-$("#nav").live("click",function(){var o=$(this);l.jsonPage.selected(o);})
-*/
+//l.dialog.alert({title:"title",content:"content",lock:"lock",btn:"OK"});
+//l.dialog.confirm({title:"title",content:"content",lock:"lock",btn1:"OK",btn2:"CANCEL"});
