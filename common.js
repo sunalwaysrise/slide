@@ -2,7 +2,6 @@
 author: luwenbin@live.com
 */
 var l={
-	xhr:window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest(),
 	getArgs:function(argName){
 		if(!argName){return}
 		var args = {},query = location.search.substring(1),pairs = query.split("&"); 
@@ -64,7 +63,8 @@ var l={
     jsonPage:{},
     dialog:{}
 }
-$.extend(l.ajax,{
+l.ajax={
+	xhr:window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest(),
 	basic:function(config){
 		var url=config.url,method=config.method,data=config.data,anysc=config.anysc,before=config.before,success=config.success,error=config.error,tmpdata,tempdate2=[];
 		if(!url){return false;}
@@ -83,29 +83,26 @@ $.extend(l.ajax,{
 		}
 		method=method.toUpperCase();
 		if(method!="GET"){
-		    l.xhr.open("POST",url,anysc);
-		    l.xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		    l.xhr.send(tmpdata);
+		    this.xhr.open("POST",url,anysc);
+		    this.xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		    this.xhr.send(tmpdata);
 		}else{
-		    l.xhr.open("GET",url+"?"+tmpdata,anysc);
-		    l.xhr.send();				
+		    this.xhr.open("GET",url+"?"+tmpdata+"&noCache="+new Date().getTime(),anysc);
+		    this.xhr.send();				
 		}
-		l.xhr.onreadystatechange=function(){
-			if(l.xhr.readyState==0||l.xhr.readyState==1){
-				//尚未链接；
-			}else if(l.xhr.readyState==2){
+		this.xhr.onreadystatechange=function(){
+			if(l.ajax.xhr.readyState==0 || l.ajax.xhr.readyState==1){
+				//准备中；
+			}else if(l.ajax.xhr.readyState==2){
 				if(typeof(before)=="function"){
 					before();
 				}
-			}else if(l.xhr.readyState==4){
-				if(l.xhr.status==200){
-					//console.log(l.xhr.responseText);
+			}else if(l.ajax.xhr.readyState==4){
+				if(l.ajax.xhr.status==200){
 					if(typeof(success)=="function"){
-						success(l.xhr.responseText);
+						success(l.ajax.xhr.responseText);
 					}
-				}else if(l.xhr.status==404){
-					return "request 404";
-				}else{
+				}else if(l.ajax.xhr.status==404){
 					if(typeof(error)=="function"){
 						error();
 					}
@@ -137,10 +134,10 @@ $.extend(l.ajax,{
 		if(_config.error){config.error=_config.error;}
 		l.ajax.basic(config);
 	}
-})
+}
 //实例 l.ajax.get({url:"url",data:"data",before:"before",success:"success",error:"error"});
 //实例 l.ajax.baisc({url:"url",data:"data",method:"post",anysc:false,before:"before",success:"success",error:"error"});
-$.extend(l.jsonPage,{
+l.jsonPage={
 	_data:"",
 	_nav:"",
 	_content:"",
@@ -199,15 +196,16 @@ $.extend(l.jsonPage,{
     	this._nav.last().attr({"data_beginRow":prev2,"data_endRow":next});
     	this.setContent(beginRow,endRow);
     }
-})
+};
 /*
 l.jsonPage.index(data,"10","#nav","#content")
 $("#nav").live("click",function(){var o=$(this);l.jsonPage.selected(o);})
 */
-$.extend(l.dialog,{
+l.dialog={
+	locker:false,
 	creater:function(){
-		if(!$("#lDialogBox")){
-		    $(body).append('<div id="lDialogBox"><div class="lDialogBoxTitle"><div id="lDialogBoxTitle"></div><div id="lDialogClose"></div></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
+		if($("#lDialogBox").length==0){
+		    $("body").append('<div id="lDialogBox"><div class="lDialogBoxTitle"><div id="lDialogBoxTitle"></div><div id="lDialogClose"></div></div><div id="lDialogBoxContent"></div><div id="lDialogBoxBtn"></div></div>');
 	    }
 		$("#lDialogBox").css({"position":"absolute","zIndex":"1000"}).show();
 		l.setPosition($("#lDialogBox"));
@@ -222,7 +220,14 @@ $.extend(l.dialog,{
 		$("#lDialogBoxContent").html(content);
 		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn+'</a>');
 		if(config.lock=="lock"){
-			$(window).resize(function(){l.throttle(this.lock(), 50, 100)});
+			this.locker=true;
+			this.lock();
+			$(window).resize(function(){
+				if(l.dialog.locker){
+					l.throttle(l.dialog.lock(), 50, 100);
+					l.throttle(l.setPosition($("#lDialogBox")), 50, 100);
+				}
+			});
 		}
 		this.selected();
 	},
@@ -237,43 +242,53 @@ $.extend(l.dialog,{
 		$("#lDialogBoxContent").html(content);
 		$("#lDialogBoxBtn").html('<a id="lDialogTrue">'+btn1+'</a><a id="lDialogFalse">'+btn2+'</a>');
 		if(config.lock=="lock"){
-			$(window).resize(function(){l.throttle(this.lock(), 50, 100)});
+			this.locker=true;
+			this.lock();
+			$(window).resize(function(){
+				if(l.dialog.locker){
+					l.throttle(l.dialog.lock(), 50, 100);
+					l.throttle(l.setPosition(), 50, 100);
+				}
+			});
 		}
 		this.selected();
 	},
 	selected:function(){
 		$("#lDialogTrue").live('click',function(){
 			//
-			this.close();
+			l.dialog.close();
 		});
 		$("#lDialogFalse").live('click',function(){
 			//
-			this.close();
+			l.dialog.close();
 		});
 		$("#lDialogClose").live('click',function(){
-			this.close();
+			l.dialog.close();
 		});
 	},
 	close:function(){
+		this.locker=false;
 		$("#lDialogBox,#lDialogLock").hide();
 		$("#lDialogBoxTitle,#lDialogBoxContent,#lDialogBoxBtn").html("");
 	},
 	lock:function(){
-		if(!$("#lDialogLock")){
-			$(body).append('<div id="lDialogLock"></div>');
+		if($("#lDialogLock").length==0){
+			$("body").append('<div id="lDialogLock"></div>');
 		}
-		var lockWidth=$(window).width(),lockHeight=$(window).height();
+		var lockWidth=$(window).width(),lockHeight=$(document).height();
 		$("#lDialogLock").css({
 			"width":lockWidth,
 			"height":lockHeight,
 			"position":"absolute",
 			"zIndex":"999",
+			"top":0,
+			"left":0,
 			"background":"#ddd",
-			"opacity":"0.3",
+			"opacity":"0.8",
 			"filter":"Alpha(opacity=30)"
-		}).show("fast");
+		}).fadeIn();
 	}
-})
+};
 //l.dialog.alert({title:"title",content:"content",lock:"lock",btn:"OK"});
 //l.dialog.confirm({title:"title",content:"content",lock:"lock",btn1:"OK",btn2:"CANCEL"});
 
