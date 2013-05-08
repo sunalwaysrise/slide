@@ -260,3 +260,4 @@ $.extend(l.dialog,{
 })
 //l.dialog.alert({title:"title",content:"content",lock:"lock",btn:"OK"});
 //l.dialog.confirm({title:"title",content:"content",lock:"lock",btn1:"OK",btn2:"CANCEL"});
+
