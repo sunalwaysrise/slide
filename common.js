@@ -91,13 +91,15 @@ $.extend(l.ajax,{
 		    l.xhr.send();				
 		}
 		l.xhr.onreadystatechange=function(){
-			if(l.xhr.readyState==0||l.xhr.readyState==1||l.xhr.readyState==2||l.xhr.readyState==3){
+			if(l.xhr.readyState==0||l.xhr.readyState==1){
+				//尚未链接；
+			}else if(l.xhr.readyState==2){
 				if(typeof(before)=="function"){
-					before;
+					before();
 				}
 			}else if(l.xhr.readyState==4){
 				if(l.xhr.status==200){
-					console.log(l.xhr.responseText);
+					//console.log(l.xhr.responseText);
 					if(typeof(success)=="function"){
 						success(l.xhr.responseText);
 					}
@@ -105,7 +107,7 @@ $.extend(l.ajax,{
 					return "request 404";
 				}else{
 					if(typeof(error)=="function"){
-						error;
+						error();
 					}
 				}
 			}
@@ -113,7 +115,7 @@ $.extend(l.ajax,{
 	},
 	get:function(_config){
 		var config={};
-		if(!config.url){return false;}
+		if(!_config.url){return false;}
 		config.url=_config.url;
 		config.method="get";
 		config.anysc=true;
@@ -125,7 +127,7 @@ $.extend(l.ajax,{
 	},
 	post:function(_config){
 		var config={};
-		if(!config.url){return false;}
+		if(!_config.url){return false;}
 		config.url=_config.url;
 		config.method="post";
 		config.anysc=true;
