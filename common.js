@@ -199,8 +199,8 @@ var l={
     }
 }
 l.ajax={
-	xhr:window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest(),
 	basic:function(config){
+		var xhr=window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
 		var url=config.url,method=config.method,data=config.data,anysc=config.anysc,before=config.before,success=config.success,error=config.error,tmpdata,tempdate2=[];
 		if(!url){return false;}
 		anysc!=false ? anysc=true:anysc=false;
@@ -218,26 +218,28 @@ l.ajax={
 		}
 		method=method.toUpperCase();
 		if(method!="GET"){
-		    this.xhr.open("POST",url,anysc);
-		    this.xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		    this.xhr.send(tmpdata);
+		    xhr.open("POST",url,anysc);
+		    xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		    xhr.send(tmpdata);
 		}else{
-		    this.xhr.open("GET",url+"?"+tmpdata+"&noCache="+new Date().getTime(),anysc);
-		    this.xhr.send();				
+		    xhr.open("GET",url+"?"+tmpdata+"&noCache="+new Date().getTime(),anysc);
+		    xhr.send();
 		}
-		this.xhr.onreadystatechange=function(){
-			if(l.ajax.xhr.readyState==0 || l.ajax.xhr.readyState==1){
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState==0 || xhr.readyState==1){
 				//准备中；
-			}else if(l.ajax.xhr.readyState==2){
+			}else if(xhr.readyState==2){
 				if(typeof(before)=="function"){
 					before();
 				}
-			}else if(l.ajax.xhr.readyState==4){
-				if(l.ajax.xhr.status==200){
+			}else if(xhr.readyState==4){
+				if(xhr.status==200){
 					if(typeof(success)=="function"){
-						success(l.ajax.xhr.responseText);
+						success(xhr.responseText);
+						delete xhr;
+						xhr = null;
 					}
-				}else if(l.ajax.xhr.status==404){
+				}else if(xhr.status==404){
 					if(typeof(error)=="function"){
 						error();
 					}
